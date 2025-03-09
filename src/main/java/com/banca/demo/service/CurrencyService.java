@@ -56,6 +56,7 @@ public class CurrencyService implements ICurrencyService {
                             operationRequest.getOriginalAmount().multiply(operationResponse.getChangeType()));
 
                     return operationResponse;
-                });
+                }).doOnSuccess(x -> System.out.println("success"))
+                .doOnError(e -> System.out.println("error"));
     }
 }
