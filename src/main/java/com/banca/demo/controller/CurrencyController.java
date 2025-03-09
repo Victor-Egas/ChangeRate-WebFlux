@@ -1,9 +1,11 @@
 package com.banca.demo.controller;
 
 import com.banca.demo.model.Currency;
+import com.banca.demo.model.ExchangeRate;
 import com.banca.demo.model.OperationDataRequest;
 import com.banca.demo.model.OperationDataResponse;
 import com.banca.demo.service.CurrencyService;
+import com.banca.demo.service.ExternalService;
 import com.banca.demo.service.ICurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -22,6 +24,9 @@ public class CurrencyController {
 
     @Autowired
     private ICurrencyService service;
+
+    @Autowired
+    private ExternalService externalService;
 
     @GetMapping("/all")
     public Mono<ResponseEntity<Flux<List<Currency>>>> getAllCurrencyType() {
@@ -69,5 +74,11 @@ public class CurrencyController {
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(service.getOperationDataResponse(operationRequest)));
+    }
+
+    @GetMapping("/external-codes")
+    public Flux<ExchangeRate> getByIdCurrency() {
+        System.out.println("ENTRO");
+        return externalService.getCurrencyCodes();
     }
 }
