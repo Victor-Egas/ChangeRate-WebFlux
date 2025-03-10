@@ -1,5 +1,6 @@
 package com.banca.demo.service;
 
+import com.banca.demo.builder.OperationDataBuilder;
 import com.banca.demo.model.Currency;
 import com.banca.demo.model.OperationDataRequest;
 import com.banca.demo.model.OperationDataResponse;
@@ -42,21 +43,11 @@ public class CurrencyService implements ICurrencyService {
         Currency finalCurrency = currencyDao.findById(operationRequest.getCodeFinalCurrency()).get();
 
 
-        return Mono.just(operationRequest)
-                .map(request -> {
-                    OperationDataResponse operationResponse = new OperationDataResponse();
-                    operationResponse.setNameCurrency(finalCurrency.getName());
-                    operationResponse.setSymbolCurrency(finalCurrency.getSymbol());
-                    operationResponse.setChangeType(
-                            Util.getChangeType(
-                                    originalCurrency.getChangeType(),
-                                    finalCurrency.getChangeType()));
-                    operationResponse.setOriginalAmount(operationRequest.getOriginalAmount());
-                    operationResponse.setFinalAmount(
-                            operationRequest.getOriginalAmount().multiply(operationResponse.getChangeType()));
-
-                    return operationResponse;
-                }).doOnSuccess(x -> System.out.println("success"))
+        return Mono.zip(Mono.just(currencyDao.findById(operationRequest.getCodeOriginalCurrency()).get()),
+                Mono.just(currencyDao.findById(operationRequest.getCodeFinalCurrency()).get()))
+               .map(result -> OperationDataBuilder.convertOperationDataResponse(
+                       operationRequest, result.getT1(), result.getT2()))
+                .doOnSuccess(x -> System.out.println("success"))
                 .doOnError(e -> System.out.println("error"));
     }
 }
