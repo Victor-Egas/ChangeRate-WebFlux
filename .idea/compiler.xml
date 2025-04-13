@@ -8,11 +8,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="banca-exchange-rate" />
+        <module name="ChangeRate-WebFlux" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ChangeRate-WebFlux" options="-parameters" />
       <module name="banca-exchange-rate" options="-parameters" />
     </option>
   </component>
