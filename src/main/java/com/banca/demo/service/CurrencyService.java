@@ -6,6 +6,7 @@ import com.banca.demo.model.OperationDataRequest;
 import com.banca.demo.model.OperationDataResponse;
 import com.banca.demo.repository.CurrencyDao;
 import com.banca.demo.util.Util;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CurrencyService implements ICurrencyService {
 
@@ -39,6 +41,7 @@ public class CurrencyService implements ICurrencyService {
     @Override
     public Mono<OperationDataResponse> getOperationDataResponse(
             OperationDataRequest operationRequest) {
+        log.info("Inicia el Service getOperationDataResponse()");
         Currency originalCurrency = currencyDao.findById(operationRequest.getCodeOriginalCurrency()).get();
         Currency finalCurrency = currencyDao.findById(operationRequest.getCodeFinalCurrency()).get();
 
@@ -47,7 +50,8 @@ public class CurrencyService implements ICurrencyService {
                 Mono.just(currencyDao.findById(operationRequest.getCodeFinalCurrency()).get()))
                .map(result -> OperationDataBuilder.convertOperationDataResponse(
                        operationRequest, result.getT1(), result.getT2()))
-                .doOnSuccess(x -> System.out.println("success"))
-                .doOnError(e -> System.out.println("error"));
+                .doOnSuccess(x -> log.info("Se realizo el tipo de cambio con exito"))
+                .doOnError(e -> log.error("Ocurrio un error en el tipo de cambio, error {}", e.getMessage()))
+                .doFinally(signalType -> log.info("Finalizo el SERVICE getOperationDataResponse()"));
     }
 }

@@ -7,6 +7,7 @@ import com.banca.demo.model.OperationDataResponse;
 import com.banca.demo.service.CurrencyService;
 import com.banca.demo.service.ExternalService;
 import com.banca.demo.service.ICurrencyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @RestController
 @RequestMapping("/currency")
 public class CurrencyController {
@@ -50,6 +52,7 @@ public class CurrencyController {
     @PostMapping("/insert")
     public Mono<ResponseEntity<Mono<Currency>>> saveCurrency(
             @RequestBody Currency currency) {
+
         return Mono.just(ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -70,10 +73,12 @@ public class CurrencyController {
     @PostMapping("/changeType")
     public Mono<ResponseEntity<Mono<OperationDataResponse>>> getExchangeRateAmount(
             @RequestBody OperationDataRequest operationRequest) {
+        log.info("Inicio el tipo de cambio");
         return Mono.just(ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(service.getOperationDataResponse(operationRequest)));
+                .body(service.getOperationDataResponse(operationRequest)))
+                .doFinally(signalType -> log.info("Finalizo el tipo de cambio"));
     }
 
     @GetMapping("/external-codes")
